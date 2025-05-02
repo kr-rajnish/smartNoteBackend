@@ -9,8 +9,7 @@ const { Schema } = mongoose;
 //Defining Schema and adding validations
 const userSchema = new Schema(
   {
-    firstName: { type: String, required: true, trim: true, minLength: 4 },
-    lastName: { type: String, trim: true },
+    fullName: { type: String, required: true, trim: true, minLength: 4 },
 
     emailId: {
       type: String,
@@ -34,18 +33,6 @@ const userSchema = new Schema(
         }
       },
     },
-    age: { type: Number, min: 18 },
-    gender: {
-      type: String,
-      //custom validation
-      validate(value) {
-        if (!["male", "female", "other"].includes(value.toLowerCase())) {
-          throw new Error("Invalid gender");
-        }
-      },
-    },
-    about: { type: String, trim: true, default: "I am a new user" },
-    skills: { type: [String] },
   },
   {
     timestamps: true,

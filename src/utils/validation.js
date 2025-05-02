@@ -1,8 +1,8 @@
 const validator = require("validator");
 
 const validateSignupData = (req) => {
-  const { firstName, lastName, emailId, password } = req.body;
-  if (!firstName || !lastName) {
+  const { fullName, emailId, password } = req.body;
+  if (!fullName) {
     throw new Error("Please enter all the required fields");
   } else if (!validator.isEmail(emailId)) {
     throw new Error("Please enter a valid email id");
