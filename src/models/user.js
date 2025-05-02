@@ -33,7 +33,12 @@ const userSchema = new Schema(
         }
       },
     },
+    isFirstLogin: {
+      type: Boolean,
+      default: true,
+    },
   },
+
   {
     timestamps: true,
   }

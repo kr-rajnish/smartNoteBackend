@@ -1,5 +1,4 @@
 const express = require("express");
-// const { adminAuth, userAuth } = require("./middlewares/auth");
 const connectDB = require("./confige/database");
 const User = require("./models/user");
 const { validateSignupData } = require("./utils/validation");
@@ -8,6 +7,9 @@ const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const { userAuth } = require("./middlewares/auth");
 const cors = require("cors");
+
+// **********
+const Note = require("./models/notes");
 
 const app = express();
 
@@ -74,12 +76,55 @@ app.post("/login", async (req, res) => {
           id: user._id,
           name: user.fullName,
           emailId: user.emailId,
+          isFirstLogin: user.isFirstLogin,
         },
       });
     } else {
       throw new Error("User not found");
     }
   } catch (error) {
+    res.status(400).send("ERROR: " + error.message);
+  }
+});
+
+// API to update isFirstLogin status
+app.put("/updateFirstLoginStatus", userAuth, async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { isFirstLogin: false },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "First login status updated successfully",
+      isFirstLogin: updatedUser.isFirstLogin,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("ERROR: " + error.message);
+  }
+});
+
+// API to check isFirstLogin status
+app.get("/checkFirstLoginStatus", userAuth, async (req, res) => {
+  try {
+    return res.status(200).json({
+      success: true,
+      isFirstLogin: req.user.isFirstLogin,
+    });
+  } catch (error) {
+    console.log(error);
     res.status(400).send("ERROR: " + error.message);
   }
 });
@@ -108,6 +153,57 @@ app.post("/sendConnectionRequest", userAuth, async (req, res) => {
 app.post("/logout", userAuth, (req, res) => {
   res.clearCookie("token");
   return res.status(200).json({ success: true, message: "Logout successful" });
+});
+
+// *********************
+app.post("/createNote", userAuth, async (req, res) => {
+  try {
+    const note = new Note(req.body);
+    const savedNote = await note.save();
+    res.send(savedNote);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("ERROR: " + error.message);
+  }
+});
+
+app.get("/getNotes", userAuth, async (req, res) => {
+  try {
+    const { search, tag } = req.query;
+    const query = { user: req.user._id };
+
+    if (search) {
+      query.title = { $regex: search, $options: "i" };
+    }
+
+    const notes = await Note.find(query);
+    res.send(notes);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("ERROR: " + error.message);
+  }
+});
+
+app.delete("/deleteNote/:id", userAuth, async (req, res) => {
+  try {
+    const note = await Note.findByIdAndDelete(req.params.id);
+    res.send(note);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("ERROR: " + error.message);
+  }
+});
+
+app.put("/updateNote/:id", userAuth, async (req, res) => {
+  try {
+    const note = await Note.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    res.send(note);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("ERROR: " + error.message);
+  }
 });
 
 connectDB()
