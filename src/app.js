@@ -32,6 +32,10 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+app.get("/api/data", (req, res) => {
+  res.json({ message: "CORS is now enabled!" });
+});
+
 app.post("/signup", async (req, res) => {
   const user = new User(req.body);
 
