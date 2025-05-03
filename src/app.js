@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const connectDB = require("./confige/database");
 const User = require("./models/user");
 const { validateSignupData } = require("./utils/validation");
@@ -12,11 +13,12 @@ const cors = require("cors");
 const Note = require("./models/notes");
 
 const app = express();
+const port = process.env.PORT || 3000;
 
 // Allow frontend origin here
 app.use(
   cors({
-    origin: "http://localhost:5173", // replace with your frontend URL
+    origin: `${process.env.FRONTEND_LOCAL_URL}`,
     credentials: true,
   })
 );
@@ -209,8 +211,8 @@ app.put("/updateNote/:id", userAuth, async (req, res) => {
 connectDB()
   .then(() => {
     console.log("Database is connected");
-    app.listen(5000, () => {
-      console.log("Server is running on port 5000");
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
     });
   })
   .catch((err) => {
