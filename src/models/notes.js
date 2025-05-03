@@ -31,7 +31,6 @@ const NoteSchema = new Schema(
   { timestamps: true }
 );
 
-// Create index for search functionality
 NoteSchema.index({ title: "text", content: "text", tags: "text" });
 
 module.exports = mongoose.model("Note", NoteSchema);

@@ -3,10 +3,8 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-//importing Schema
 const { Schema } = mongoose;
 
-//Defining Schema and adding validations
 const userSchema = new Schema(
   {
     fullName: { type: String, required: true, trim: true, minLength: 4 },
@@ -62,8 +60,6 @@ userSchema.methods.validatePassword = async function (passwordInputByUser) {
   return isPasswordValid;
 };
 
-//creating a module
 const User = mongoose.model("User", userSchema);
 
-//Exporting the module
 module.exports = User;

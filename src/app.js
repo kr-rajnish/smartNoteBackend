@@ -9,29 +9,23 @@ const jwt = require("jsonwebtoken");
 const { userAuth } = require("./middlewares/auth");
 const cors = require("cors");
 
-// **********
 const Note = require("./models/notes");
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Allow frontend origin here (for both local and deployed frontend)
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // Local frontend URL
-      "https://smartnotefrontend.onrender.com", // Deployed frontend URL
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Add any other headers you need
-    credentials: true, // Enable sending cookies/credentials with requests
+    origin: ["http://localhost:5173", "https://smartnotefrontend.onrender.com"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 
 app.use(express.json());
 app.use(cookieParser());
 
-// Routes and API Definitions
 app.get("/api/data", (req, res) => {
   res.json({ message: "CORS is now enabled!" });
 });
@@ -73,13 +67,6 @@ app.post("/login", async (req, res) => {
 
     const isPasswordValid = await user.validatePassword(password);
     if (isPasswordValid) {
-      // const token = await user.getJWT();
-      // console.log("token", token);
-
-      // res.cookie("token", token, {
-      //   expires: new Date(Date.now() + 8 * 3600000),
-      // });
-
       const token = await user.getJWT();
       console.log("Generated token:", token);
 
@@ -163,7 +150,7 @@ app.get("/profile", userAuth, async (req, res) => {
   }
 });
 
-// *********************
+// Create Note
 app.post("/createNote", userAuth, async (req, res) => {
   try {
     const note = new Note(req.body);
@@ -175,6 +162,7 @@ app.post("/createNote", userAuth, async (req, res) => {
   }
 });
 
+// Get Notes
 app.get("/getNotes", userAuth, async (req, res) => {
   try {
     const { search, tag } = req.query;
@@ -192,6 +180,7 @@ app.get("/getNotes", userAuth, async (req, res) => {
   }
 });
 
+// Delete Note
 app.delete("/deleteNote/:id", userAuth, async (req, res) => {
   try {
     const note = await Note.findByIdAndDelete(req.params.id);
@@ -202,6 +191,7 @@ app.delete("/deleteNote/:id", userAuth, async (req, res) => {
   }
 });
 
+// Update Note
 app.put("/updateNote/:id", userAuth, async (req, res) => {
   try {
     const note = await Note.findByIdAndUpdate(req.params.id, req.body, {
@@ -217,7 +207,6 @@ app.put("/updateNote/:id", userAuth, async (req, res) => {
 // Logout API
 app.post("/logout", async (req, res) => {
   try {
-    // Clear the token cookie
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
