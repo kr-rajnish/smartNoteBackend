@@ -18,7 +18,7 @@ const port = process.env.PORT || 3000;
 // Allow frontend origin here
 app.use(
   cors({
-    origin: `${process.env.FRONTEND_LOCAL_URL}`,
+    origin: `${process.env.FRONTEND_URL} || ${process.env.FRONTEND_LOCAL_URL}`,
     credentials: true,
   })
 );
