@@ -16,12 +16,13 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Allow frontend origin here
-app.use(
-  cors({
-    origin: `${process.env.FRONTEND_URL} || ${process.env.FRONTEND_LOCAL_URL}`,
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: `${process.env.FRONTEND_URL} || ${process.env.FRONTEND_LOCAL_URL}`,
+//     credentials: true,
+//   })
+// );
+app.use(cors());
 
 app.use(express.json());
 app.use(cookieParser());
