@@ -15,25 +15,23 @@ const Note = require("./models/notes");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Allow frontend origin here
-// app.use(
-//   cors({
-//     origin: `${process.env.FRONTEND_URL} || ${process.env.FRONTEND_LOCAL_URL}`,
-//     credentials: true,
-//   })
-// );
+// Allow frontend origin here (for both local and deployed frontend)
 app.use(
   cors({
-    origin: "*", // Allow all origins (you can also set this to a specific origin like 'https://yourfrontend.com')
+    origin: [
+      "http://localhost:5173", // Local frontend URL
+      "https://smartnotefrontend.onrender.com", // Deployed frontend URL
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Add any other headers you need here
-    credentials: true, // If you're sending cookies or credentials
+    allowedHeaders: ["Content-Type", "Authorization"], // Add any other headers you need
+    credentials: true, // Enable sending cookies/credentials with requests
   })
 );
 
 app.use(express.json());
 app.use(cookieParser());
 
+// Routes and API Definitions
 app.get("/api/data", (req, res) => {
   res.json({ message: "CORS is now enabled!" });
 });
@@ -42,7 +40,6 @@ app.post("/signup", async (req, res) => {
   const user = new User(req.body);
 
   try {
-    //validation of data
     validateSignupData(req);
 
     const { fullName, emailId, password } = req.body;
@@ -65,7 +62,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-//login API
+// login API
 app.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
@@ -94,7 +91,7 @@ app.post("/login", async (req, res) => {
         },
       });
     } else {
-      throw new Error("User not found");
+      throw new Error("Invalid credentials");
     }
   } catch (error) {
     res.status(400).send("ERROR: " + error.message);
@@ -143,7 +140,7 @@ app.get("/checkFirstLoginStatus", userAuth, async (req, res) => {
   }
 });
 
-//Get profile
+// Get profile
 app.get("/profile", userAuth, async (req, res) => {
   try {
     const user = req.user;
@@ -152,21 +149,6 @@ app.get("/profile", userAuth, async (req, res) => {
   } catch (error) {
     res.status(400).send("ERROR: " + error.message);
   }
-});
-
-app.post("/sendConnectionRequest", userAuth, async (req, res) => {
-  try {
-    const user = req.user;
-    console.log("cookies", req.cookies);
-    res.send(user.fullName + " " + "sent a connection request");
-  } catch (error) {
-    res.status(400).send("ERROR: " + error.message);
-  }
-});
-
-app.post("/logout", userAuth, (req, res) => {
-  res.clearCookie("token");
-  return res.status(200).json({ success: true, message: "Logout successful" });
 });
 
 // *********************
@@ -220,6 +202,7 @@ app.put("/updateNote/:id", userAuth, async (req, res) => {
   }
 });
 
+// Connect to DB and Start Server
 connectDB()
   .then(() => {
     console.log("Database is connected");
