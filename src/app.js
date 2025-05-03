@@ -22,7 +22,12 @@ const port = process.env.PORT || 3000;
 //     credentials: true,
 //   })
 // );
-app.use(cors());
+app.use(
+  cors({
+    origin: "*", // Allow all origins
+    credentials: true, // Allow credentials like cookies or authorization headers
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());
