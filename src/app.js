@@ -73,12 +73,24 @@ app.post("/login", async (req, res) => {
 
     const isPasswordValid = await user.validatePassword(password);
     if (isPasswordValid) {
+      // const token = await user.getJWT();
+      // console.log("token", token);
+
+      // res.cookie("token", token, {
+      //   expires: new Date(Date.now() + 8 * 3600000),
+      // });
+
       const token = await user.getJWT();
-      console.log("token", token);
+      console.log("Generated token:", token);
 
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 3600000),
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       });
+
+      console.log("Set cookie:", req.cookies);
       return res.status(200).json({
         success: true,
         message: "Login successful",
