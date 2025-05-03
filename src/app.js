@@ -77,6 +77,7 @@ app.post("/login", async (req, res) => {
       console.log("token", token);
 
       res.cookie("token", token, {
+        sameSite: "None",
         expires: new Date(Date.now() + 8 * 3600000),
       });
       return res.status(200).json({
