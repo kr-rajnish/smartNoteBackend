@@ -24,8 +24,10 @@ const port = process.env.PORT || 3000;
 // );
 app.use(
   cors({
-    origin: "*", // Allow all origins
-    credentials: true, // Allow credentials like cookies or authorization headers
+    origin: "*", // Allow all origins (you can also set this to a specific origin like 'https://yourfrontend.com')
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Add any other headers you need here
+    credentials: true, // If you're sending cookies or credentials
   })
 );
 
